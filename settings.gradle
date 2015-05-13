@@ -1,0 +1,2 @@
+include ':app', ':processor', ':easyipc-api'
+
