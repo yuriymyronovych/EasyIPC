@@ -54,3 +54,7 @@ dependencies {
 * build your project 
 * Use auto-generated (*service_name* + Client).java to access your service
 * Enjoy xD
+
+# Q&A
+1. How can a remote app access my service? </br>
+Just copy (*service_name* + Client).java to the client app and use it.
