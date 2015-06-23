@@ -29,7 +29,7 @@ TestServiceClient.bind(this, new TestServiceClient.ServiceConnection() {
         }, Context.BIND_AUTO_CREATE);
 ```
 # Integration Guide
-1. Gradle
+* Gradle
 ```
 dependencies {
         classpath 'com.android.tools.build:gradle:1.1.3'
@@ -48,9 +48,9 @@ dependencies {
     compile "com.ym.easyipc:easyipc-api:1.+"
 ...
 ```
-2. Extend your service from EasyIPCService
-3. Mark the method in your service with @EasyIPCMethod
-4. In case you use any object as method args or retun param than make sure to mark it as Serializable
-5. build your project 
-6. Use auto-generated (*service_name* + Client).java to access your service
-7. Enjoy xD
+* Extend your service from EasyIPCService
+* Mark the method in your service with @EasyIPCMethod
+* In case you use any object as method args or retun param than make sure to mark it as Serializable
+* build your project 
+* Use auto-generated (*service_name* + Client).java to access your service
+* Enjoy xD
