@@ -30,7 +30,7 @@ TestServiceClient.bind(this, new TestServiceClient.ServiceConnection() {
 ```
 # Integration Guide
 * Gradle
-```
+```Gradle
 dependencies {
         classpath 'com.android.tools.build:gradle:1.1.3'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
