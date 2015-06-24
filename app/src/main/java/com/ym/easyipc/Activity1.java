@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import com.ym.easyipc.TestServiceClient;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 
