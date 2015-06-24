@@ -1,6 +1,5 @@
 # EasyIPC
 Custom Implementation of Android IPC.</br>
-Note: waiting for jcenter to approve 1.0.3
 
 * forget aidl
 * forget parcelable
