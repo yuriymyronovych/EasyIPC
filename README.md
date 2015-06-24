@@ -32,20 +32,8 @@ TestServiceClient.bind(this, new TestServiceClient.ServiceConnection() {
 * Gradle
 ```Gradle
 dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.3'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
-    }
-}
-apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
-
-repositories {
-    jcenter()
-}
-
-dependencies {
-    apt "com.ym.easyipc:easyipc-api:1.+"
     compile "com.ym.easyipc:easyipc-api:1.+"
+    provided "com.ym.easyipc:easyipc-api:1.+"
 ...
 ```
 * Extend your service from EasyIPCService
@@ -58,3 +46,5 @@ dependencies {
 # Q&A
 1. How can a remote app access my service? </br>
 Just copy (*service_name* + Client).java to the client app and use it.
+2. My IDE show a compilation and can't find a (*service_name* + Client).java!
+The Client class is generated during compilation at the path build/intermediates/classes/release/. You can add that folder as a source to your project or just ignore the compilation error from IDE. Gradle should build it fine.
