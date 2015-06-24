@@ -45,5 +45,5 @@ dependencies {
 # Q&A
 1. How can a remote app access my service? </br>
 Just copy (*service_name* + Client).java to the client app and use it.
-2. My IDE show a compilation and can't find a (*service_name* + Client).java!
+2. My IDE show a compilation error and can't find a (*service_name* + Client).java! </br>
 The Client class is generated during compilation at the path build/intermediates/classes/release/. You can add that folder as a source to your project or just ignore the compilation error from IDE. Gradle should build it fine.
