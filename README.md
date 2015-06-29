@@ -16,16 +16,33 @@ public class TestService extends EasyIPCService {
     }
 }
 
-//the TestServiceClient.java is generated for you
-TestServiceClient.bind(this, new TestServiceClient.ServiceConnection() {
+//this is your activity
+public class ActivityTest extends Activity {
+    private TestServiceClient serviceClient; //the TestServiceClient.java is generated for you
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        
+        bindService(new Intent(this, TestService.class), new TestServiceClient.Connection() {
             @Override
             public void onServiceConnected(TestServiceClient client) {
+                serviceClient = client;
                 System.out.println(client.test("", 1, new MySerialisableObject());
             }
 
             @Override
-            public void onServiceDisconnected() {}
+            public void onServiceDisconnected() {
+                serviceClient = null;
+            }
         }, Context.BIND_AUTO_CREATE);
+    }
+    
+    @Override
+    protected void onDestroy() {
+        if (serviceClient != null) {
+            unbindService(serviceClient.getConnection());
+        }
+    }
 ```
 # Integration Guide
 * Gradle
