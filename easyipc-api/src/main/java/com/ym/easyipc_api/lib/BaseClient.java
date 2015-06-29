@@ -26,8 +26,18 @@ import java.io.ObjectOutputStream;
 /**
  * Created by Yuriy Myronovych on 12/05/2015.
  */
-public abstract class BaseClient {
-    protected abstract String getAddress();
+public class BaseClient {
+    protected String address;
+
+    public BaseClient(String address) {
+        this.address = address;
+    }
+
+    public SocketClient connect() throws IOException {
+        return new SocketClient().connect();
+    }
+
+
     public class SocketClient {
         protected LocalSocket socket;
         public ObjectInputStream resStream;
@@ -35,7 +45,7 @@ public abstract class BaseClient {
 
         public SocketClient connect() throws IOException {
             socket = new LocalSocket();
-            socket.connect(new LocalSocketAddress(getAddress()));
+            socket.connect(new LocalSocketAddress(address));
             argsStream = new ObjectOutputStream(socket.getOutputStream());
             resStream = new ObjectInputStream(socket.getInputStream());
             return this;

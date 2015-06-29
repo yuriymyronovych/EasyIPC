@@ -14,10 +14,10 @@ repositories {
 
 dependencies {
 
-    compile "com.ym.easyipc:easyipc-api:1.+"
-    provided "com.ym.easyipc:easyipc-api:1.+"
-//    apt project(":easyipc-api")
-//    compile project (":easyipc-api")
+//    compile "com.ym.easyipc:easyipc-api:1.+"
+//    provided "com.ym.easyipc:easyipc-api:1.+"
+    compile project(":easyipc-api")
+    provided project (":easyipc-api")
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.0.0'

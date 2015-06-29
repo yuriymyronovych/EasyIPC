@@ -17,6 +17,7 @@
 package com.ym.easyipc.processor;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
@@ -29,23 +30,25 @@ import java.util.List;
 public class Generator {
     private HashMap<TypeElement, List<ExecutableElement>> jobs;
     private ProcessingEnvironment env;
+    private RoundEnvironment roundEnv;
 
-    public Generator(ProcessingEnvironment env, HashMap<TypeElement, List<ExecutableElement>> jobs) {
+    public Generator(ProcessingEnvironment env, RoundEnvironment roundEnv, HashMap<TypeElement, List<ExecutableElement>> jobs) {
         this.env = env;
         this.jobs = jobs;
+        this.roundEnv = roundEnv;
     }
 
     public void generate() throws Exception {
         for (TypeElement classElem : jobs.keySet()) {
-            ResolverClassGenerator classGen = new ResolverClassGenerator(env, classElem);
-            env.getMessager().printMessage(Diagnostic.Kind.NOTE, "generating class: " + classGen.getClassName());
+            ResolverClassGenerator classGen = new ResolverClassGenerator(env, roundEnv, classElem);
+            env.getMessager().printMessage(Diagnostic.Kind.NOTE, ">>generating class: " + classGen.getClassName());
             
             classGen.generateClassDeclaration();
             classGen.generateResolveMethod(jobs.get(classElem));
             classGen.finish();
 
-            ClientClassGenerator clientClassGen = new ClientClassGenerator(env, classElem);
-            env.getMessager().printMessage(Diagnostic.Kind.NOTE, "generating class: " + classGen.getClassName());
+            ClientClassGenerator clientClassGen = new ClientClassGenerator(env, roundEnv, classElem);
+            env.getMessager().printMessage(Diagnostic.Kind.NOTE, "<<finished with class: " + classGen.getClassName());
             clientClassGen.generateClassDeclaration();
             clientClassGen.generateMethods(jobs.get(classElem));
             clientClassGen.finish();

@@ -16,14 +16,9 @@
 
 package com.ym.easyipc_api.lib;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
 /**
- * Created by Yuriy Myronovych on 21/04/2015.
+ * Created by Yuriy Myronovych on 26/06/2015.
  */
-public interface IResolver {
-    void setTarget(Object target);
-    void resolve(String method, ObjectOutputStream resultStream, ObjectInputStream argsStream) throws java.lang.Exception;
-    String getAddress();
+public interface GuidHolder {
+    String getGuid();
 }

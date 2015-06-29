@@ -20,19 +20,44 @@ import com.ym.easyipc.processor.Constants;
 import com.ym.easyipc_api.lib.EasyIPCService;
 import com.ym.easyipc_api.lib.IResolver;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by Yuriy Myronovych on 21/04/2015.
  */
 public class ResolverFactory {
-    public static IResolver getResolver(EasyIPCService service) {
+    public static IResolver getResolver(Object target) {
         try {
-            Class c = Class.forName("com.ym.easyipc_api.lib.gen." + service.getClass().getSimpleName() + Constants.CLASS_RESOLVER_NAME_TAG);
+            Class c = getResolverClass(target.getClass());
             IResolver resolver = (IResolver) c.newInstance();
-            resolver.setService(service);
+            resolver.setTarget(target);
             return resolver;
         } catch(Exception e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private static Class getResolverClass(Class targetClass) {
+        Class result = null;
+
+        List<Class> options = new ArrayList<Class>();
+        while (targetClass != Object.class) {
+            options.add(targetClass);
+            options.addAll(Arrays.asList(targetClass.getInterfaces()));
+            targetClass = targetClass.getSuperclass();
+        }
+
+        for (Class clazz : options) {
+            try {
+                String className = "com.ym.easyipc_api.lib.gen." + clazz.getSimpleName() + Constants.CLASS_RESOLVER_NAME_TAG;
+                result = Class.forName(className);
+                break;
+            } catch (ClassNotFoundException e) {}
+        }
+
+        return result;
     }
 }

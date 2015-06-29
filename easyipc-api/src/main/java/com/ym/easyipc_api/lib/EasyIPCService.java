@@ -29,25 +29,17 @@ import java.io.IOException;
  * Created by Yuriy Myronovych on 21/04/2015.
  */
 public class EasyIPCService extends Service {
-    protected IResolver resolver = ResolverFactory.getResolver(this);
-
+    private EasyIPCServerHandler handler = new EasyIPCServerHandler(this);
     @Override
     public void onCreate() {
         super.onCreate();
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    LocalServerSocket socket = new LocalServerSocket(resolver.getAddress());
-                    while (true) {
-                        new LocalSocketServerHandler(resolver, socket.accept()).handle();
-                        System.out.print("LocalSocketServerHandler created");
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
+        handler.start();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        handler.stop();
     }
 
     @Override

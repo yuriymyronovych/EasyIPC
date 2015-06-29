@@ -17,10 +17,14 @@
 package com.ym.easyipc.processor;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Set;
 
 /**
  * Created by Yuriy Myronovych on 06/05/2015.
@@ -28,15 +32,20 @@ import java.io.Writer;
 public class BaseClassGenerator {
     protected PersistanceResolver persistanceResolver = new PersistanceResolver();
     protected ProcessingEnvironment env;
+    protected RoundEnvironment roundEnv;
     protected TypeElement classElem;
     protected PackageElement packageElement;
 
     protected Writer writer;
 
-    public BaseClassGenerator(ProcessingEnvironment env, TypeElement classElem) {
+    Set<? extends Element> elementsListener;
+
+    public BaseClassGenerator(ProcessingEnvironment env, RoundEnvironment roundEnv, TypeElement classElem) {
         this.env = env;
+        this.roundEnv = roundEnv;
         this.classElem = classElem;
         this.packageElement = (PackageElement) classElem.getEnclosingElement();
+        elementsListener = roundEnv.getElementsAnnotatedWith(EasyIPCListener.class);
     }
 
     public void finish() throws IOException {
@@ -51,5 +60,14 @@ public class BaseClassGenerator {
 
     public String getFullUserClassName() {
         return packageElement.getQualifiedName().toString() + "." + getUserClassName();
+    }
+
+    protected boolean isEasyIPCListener(TypeMirror type) {
+        for (Element e : elementsListener) {
+            if (env.getTypeUtils().isSameType(e.asType(), type)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

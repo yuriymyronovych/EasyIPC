@@ -17,6 +17,7 @@
 package com.ym.easyipc.processor;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
@@ -32,8 +33,8 @@ import java.util.List;
 public class ResolverClassGenerator extends BaseClassGenerator {
 
 
-    public ResolverClassGenerator(ProcessingEnvironment env, TypeElement classElem) {
-        super(env, classElem);
+    public ResolverClassGenerator(ProcessingEnvironment env, RoundEnvironment roundEnv, TypeElement classElem) {
+        super(env, roundEnv, classElem);
     }
 
     public void generateClassDeclaration() throws Exception {
@@ -41,11 +42,11 @@ public class ResolverClassGenerator extends BaseClassGenerator {
         writer.write("package " + "com.ym.easyipc_api.lib.gen" + ";\n\n");
         writer.write("class " + getClassName() + " implements " + Constants.RESOLVER_INTERFACE + " {\n\n");
         //write default methods
-        writer.write("\tprivate " + getFullUserClassName() + " service;\n\n");
+        writer.write("\tprivate " + getFullUserClassName() + " target;\n\n");
 //        writer.write("\tpublic " + getClassName() + "(){}\n\n");
 
-        writer.write("\tpublic void setService(" + Constants.EasyIPCService + " service) {\n");
-        writer.write("\t\tthis.service = (" + getFullUserClassName() + ") service;\n\t}\n\n");
+        writer.write("\tpublic void setTarget(Object target) {\n");
+        writer.write("\t\tthis.target = (" + getFullUserClassName() + ") target;\n\t}\n\n");
 
         writer.write("\t public String getAddress() {\n");
         writer.write("\t\t return \"" + getFullUserClassName() + "\";\n\t}\n\n");
@@ -73,25 +74,43 @@ public class ResolverClassGenerator extends BaseClassGenerator {
         int i = 0;
         for (VariableElement var : method.getParameters()) {
             String varType = var.asType().toString();
-            String type = persistanceResolver.resolveObjectStreamDataSign(varType);
-            writer.write("\t\t\t" + varType + " arg" + i + " = ");
-            if (type.equals("Object")) writer.write("(" + varType + ")"); //type conversation
-            writer.write(Constants.ARGS_STREAM + ".read" + type + "();\n");
+
+            if (isEasyIPCListener(var.asType())) {
+                writer.write("\t\t\tString guid" + i + " = " + Constants.ARGS_STREAM + ".readUTF();\n");
+                String listenerImpl = varType + Constants.LISTENER_IMPL_TAG;
+                writer.write(String.format(Constants.LISTENER_STATIC_POSTPROCESS, "guid" + i, "listenerarg" + i, varType + Constants.CLASS_CLIENT_NAME_TAG));
+            } else {
+                String type = persistanceResolver.resolveObjectStreamDataSign(varType);
+                writer.write("\t\t\t" + varType + " arg" + i + " = ");
+                if (type.equals("Object")) writer.write("(" + varType + ")"); //type conversation
+                writer.write(Constants.ARGS_STREAM + ".read" + type + "();\n");
+            }
+
             i++;
         }
     }
 
     private void generateServiceCallAndWriteResult(ExecutableElement method) throws IOException {
         String returnType = method.getReturnType().toString();
-        writer.write("\t\t\t" + returnType + " result = service." + method.getSimpleName() + "(");
+        if (!returnType.equals("void")) {
+            writer.write("\t\t\t" + returnType + " result = ");
+        }
+        writer.write("target." + method.getSimpleName() + "(");
         for (int i = 0; i < method.getParameters().size(); i++) {
             if (i != 0) writer.write(", ");
-            writer.write("arg" + i);
+            if (isEasyIPCListener(method.getParameters().get(i).asType())) {
+                writer.write("listenerarg" + i);
+            } else {
+                writer.write("arg" + i);
+            }
         }
         writer.write(");\n");
 
-        String returnTypeSign = persistanceResolver.resolveObjectStreamDataSign(returnType);
-        writer.write("\t\t\t" + Constants.RES_STREAM + ".write" + returnTypeSign + "(result);\n");
+        if (!returnType.equals("void")) {
+            String returnTypeSign = persistanceResolver.resolveObjectStreamDataSign(returnType);
+            writer.write("\t\t\t" + Constants.RES_STREAM + ".write" + returnTypeSign + "(result);\n");
+        }
+        writer.write("\t\t\t" + Constants.RES_STREAM + ".writeInt(1);\n");
         writer.write("\t\t\t" + Constants.RES_STREAM + ".flush();");
     }
 

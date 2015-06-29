@@ -36,7 +36,7 @@ import java.util.Set;
 /**
  * Created by Yuriy Myronovych on 21/04/2015.
  */
-@SupportedAnnotationTypes("com.ym.easyipc.processor.EasyIPCMethod")
+@SupportedAnnotationTypes({"com.ym.easyipc.processor.EasyIPCMethod", "com.ym.easyipc.processor.EasyIPCListener"})
 public class AnnotationProcessor extends AbstractProcessor {
 
     private HashMap<TypeElement, List<ExecutableElement>> jobs;
@@ -48,21 +48,25 @@ public class AnnotationProcessor extends AbstractProcessor {
                 if (elem.getKind() != ElementKind.METHOD) throw new Exception("only methods can be marked by EasyIPCMethod");
                 ExecutableElement methodElem = (ExecutableElement) elem;
                 TypeElement classElem = (TypeElement) methodElem.getEnclosingElement();
-//                if (!hasEasyIPCServiceParent(methodClass)) throw new Exception("class should extend EasyIPCService");
 
                 if (jobs.get(classElem) == null) {
                     jobs.put(classElem, new ArrayList<ExecutableElement>());
                 }
                 jobs.get(classElem).add(methodElem);
-
-                String message = "Method: " + methodElem.getSimpleName() + " / " + methodElem.getEnclosingElement().getSimpleName() + ":\n";
-                processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, message);
             }
 
-            if (!jobs.isEmpty()) {
-                new Generator(processingEnv, jobs).generate();
+            boolean hasListenerJobs = false;
+            for (Element elem : roundEnv.getElementsAnnotatedWith(EasyIPCListener.class)) {
+                hasListenerJobs = true;
+                new ListenerGenerator(processingEnv, roundEnv, (TypeElement)elem).generateClass();
+            }
+
+            if (hasListenerJobs || !jobs.isEmpty()) {
+                new Generator(processingEnv, roundEnv, jobs).generate();
                 return true;
             }
+
+
         } catch (Exception e) {
             processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "failed to generate EasyIPC classes:\n " + ExceptionUtils.getFullStackTrace(e));
 

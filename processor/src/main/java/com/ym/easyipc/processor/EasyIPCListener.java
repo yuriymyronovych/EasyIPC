@@ -14,16 +14,17 @@
  *
  */
 
-package com.ym.easyipc_api.lib;
+package com.ym.easyipc.processor;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Created by Yuriy Myronovych on 21/04/2015.
+ * Created by Yuriy Myronovych on 25/06/2015.
  */
-public interface IResolver {
-    void setTarget(Object target);
-    void resolve(String method, ObjectOutputStream resultStream, ObjectInputStream argsStream) throws java.lang.Exception;
-    String getAddress();
+@Retention(RetentionPolicy.SOURCE)
+@Target(ElementType.TYPE)
+public @interface EasyIPCListener {
 }

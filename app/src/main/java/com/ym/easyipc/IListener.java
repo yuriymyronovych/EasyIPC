@@ -14,16 +14,17 @@
  *
  */
 
-package com.ym.easyipc_api.lib;
+package com.ym.easyipc;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import com.ym.easyipc.processor.EasyIPCListener;
+import com.ym.easyipc.processor.EasyIPCMethod;
 
 /**
- * Created by Yuriy Myronovych on 21/04/2015.
+ * Created by Yuriy Myronovych on 25/06/2015.
  */
-public interface IResolver {
-    void setTarget(Object target);
-    void resolve(String method, ObjectOutputStream resultStream, ObjectInputStream argsStream) throws java.lang.Exception;
-    String getAddress();
+@EasyIPCListener
+public interface IListener {
+
+    @EasyIPCMethod
+    void onResult(int result);
 }
