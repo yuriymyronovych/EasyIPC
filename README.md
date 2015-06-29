@@ -59,6 +59,48 @@ dependencies {
 * Use auto-generated (*service_name* + Client).java to access your service
 * Enjoy xD
 
+# Listeners
+```java
+//This is your listener interface
+@EasyIPCListener
+public interface IListener {
+
+    @EasyIPCMethod
+    void onResult(int result);
+}
+```
+```java
+//This is your service, simply add methods to manage the listener and call an interface method on it whenever you need.
+public class TestService extends EasyIPCService {
+    private List<IListener> listeners = new ArrayList<IListener>();
+    
+    @EasyIPCMethod
+    public void addListener(final IListener listener) {
+        listeners.add(listener);
+    }
+    
+    @EasyIPCMethod
+    public void removeListener(IListener listener) {
+        listeners.remove(listener);
+    }
+}
+```
+
+```java
+//client code, adding listener, you have to use the *listener_name* + Impl.java generated class
+final IListenerImpl listener = new IListenerImpl() {
+            @Override
+            public void onResult(int result) {
+                System.out.println("listener received: " + result);
+            }
+        };
+        serviceClient.addListener(listener);
+        
+        ...
+        serviceClient.removeListener(listener);
+        listener.release(); //dont forget to release the listener!
+```
+
 # Q&A
 1. How can a remote app access my service? </br>
 Just copy (*service_name* + Client).java to the client app and use it.
