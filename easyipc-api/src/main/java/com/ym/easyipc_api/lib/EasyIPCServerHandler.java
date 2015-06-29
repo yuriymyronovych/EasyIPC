@@ -47,13 +47,19 @@ public class EasyIPCServerHandler {
 
     public void stop() {
         handlerThread.interrupt();
+        try {
+            handlerThread.socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     class HandlerThread extends Thread {
+        LocalServerSocket socket;
         @Override
         public void run() {
             try {
-                LocalServerSocket socket = new LocalServerSocket(address);
+                socket = new LocalServerSocket(address);
                 while (!isInterrupted()) {
                     new LocalSocketServerHandler(resolver, socket.accept()).handle();
                 }

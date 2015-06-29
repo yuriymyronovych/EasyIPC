@@ -36,7 +36,7 @@ public class Activity1 extends Activity {
 
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
-
+                serviceClient = null;
             }
         }, Context.BIND_AUTO_CREATE);
 
@@ -55,12 +55,14 @@ public class Activity1 extends Activity {
             @Override
             public void run() {
                 serviceClient.testRemoveListener(listener);
+                listener.release();
             }
         }, 1000);
     }
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         if (serviceClient != null) {
             unbindService(serviceClient.getConnection());
         }
